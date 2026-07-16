@@ -1,0 +1,10 @@
+# Dogfood: envsync's own repo runs its tests on every commit that touches Python.
+repos:
+  - repo: local
+    hooks:
+      - id: envsync-tests
+        name: envsync tests
+        entry: python -m pytest -q
+        language: system
+        pass_filenames: false
+        files: \.py$

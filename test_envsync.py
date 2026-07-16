@@ -75,3 +75,30 @@ def test_export_prefix_and_missing_env_file():
     assert d.added == ["API_KEY"]
     out = envsync.build_append(tmpl, "")
     assert envsync.parse_values(out)["API_KEY"] == "changeme"
+
+
+def test_main_missing_env_ok_returns_zero(tmp_path):
+    tmpl = tmp_path / ".env.example"
+    tmpl.write_text("FOO=bar\n")
+    env = tmp_path / ".env"  # does not exist
+    assert envsync.main([str(tmpl), str(env), "--missing-env-ok"]) == 0
+
+
+def test_main_reports_drift_nonzero(tmp_path):
+    tmpl = tmp_path / ".env.example"
+    tmpl.write_text("FOO=bar\nNEW=1\n")
+    env = tmp_path / ".env"
+    env.write_text("FOO=custom\n")  # missing NEW
+    assert envsync.main([str(tmpl), str(env)]) == 1
+
+
+def test_main_apply_syncs_then_exits_zero(tmp_path):
+    tmpl = tmp_path / ".env.example"
+    tmpl.write_text("FOO=bar\nNEW=1\n")
+    env = tmp_path / ".env"
+    env.write_text("FOO=custom\n")
+    assert envsync.main([str(tmpl), str(env), "--apply"]) == 0
+    vals = envsync.parse_values(env.read_text())
+    assert vals["FOO"] == "custom" and vals["NEW"] == "1"
+    # now in sync
+    assert envsync.main([str(tmpl), str(env)]) == 0

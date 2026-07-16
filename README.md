@@ -59,6 +59,42 @@ python3 envsync.py .env.example .env --apply --mode rewrite --backup
   order and section headers, with your values slotted in. Good for a periodic
   tidy-up; reorders the file, so use `--backup`.
 
+## Use it as a pre-commit hook
+
+envsync ships a `.pre-commit-hooks.yaml`, so another repo can gate commits on
+`.env` drift. The hook runs only when **`.env.example`** is staged (the template
+is what grows new variables) and reports whether the local `.env` is behind. It
+never fails just because `.env` is absent, so CI / env-var-only machines aren't
+blocked.
+
+In the consuming repo's `.pre-commit-config.yaml`:
+
+```yaml
+repos:
+  - repo: https://github.com/<you>/envsync
+    rev: v0.1.0
+    hooks:
+      - id: envsync
+```
+
+Or, without a remote, as a local hook:
+
+```yaml
+repos:
+  - repo: local
+    hooks:
+      - id: envsync
+        name: envsync — .env vs .env.example
+        entry: python3 /path/to/envsync.py --missing-env-ok .env.example .env
+        language: system
+        files: (^|/)\.env\.example$
+        pass_filenames: false
+```
+
+Now when you `git commit` an updated `.env.example`, the hook fails the commit if
+your `.env` is missing a newly-documented variable — run
+`envsync.py .env.example .env --apply` to fix it, then re-commit.
+
 ## Tests
 
 ```bash

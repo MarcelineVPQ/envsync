@@ -1,0 +1,19 @@
+# Reusable pre-commit hook. Other repos consume it via:
+#
+#   repos:
+#     - repo: https://github.com/<you>/envsync
+#       rev: v0.1.0
+#       hooks:
+#         - id: envsync
+#
+# It runs only when .env.example is staged (the template is the thing that grows
+# new variables), then reports whether the local .env is missing any of them.
+# It never fails just because .env is absent (--missing-env-ok), so CI and
+# machines that configure via real env vars aren't blocked.
+- id: envsync
+  name: envsync — .env vs .env.example
+  description: Fail if your .env is missing variables that .env.example documents.
+  entry: envsync.py --missing-env-ok .env.example .env
+  language: script
+  files: (^|/)\.env\.example$
+  pass_filenames: false

@@ -178,11 +178,16 @@ def main(argv: Optional[List[str]] = None) -> int:
                     help="append (default: add missing vars in place) or rewrite (restructure to template)")
     ap.add_argument("--backup", action="store_true", help="write ENVFILE.bak before applying")
     ap.add_argument("--no-comments", action="store_true", help="append mode: omit template comments")
+    ap.add_argument("--missing-env-ok", action="store_true",
+                    help="exit 0 (not 1) when ENVFILE doesn't exist — for pre-commit on machines with no .env")
     args = ap.parse_args(argv)
 
     if not args.template.exists():
         print(f"error: template not found: {args.template}", file=sys.stderr)
         return 2
+    if not args.envfile.exists() and args.missing_env_ok:
+        print(f"{args.envfile} not present — nothing to reconcile (--missing-env-ok).")
+        return 0
     template_text = args.template.read_text()
     env_text = args.envfile.read_text() if args.envfile.exists() else ""
 
