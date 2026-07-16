@@ -83,9 +83,9 @@ def parse_blocks(text: str) -> List[Block]:
 
 @dataclass
 class Diff:
-    added: List[str]      # in template, missing from env
-    extra: List[str]      # in env, not in template
-    present: List[str]    # in both
+    added: List[str]  # in template, missing from env
+    extra: List[str]  # in env, not in template
+    present: List[str]  # in both
 
     @property
     def in_sync(self) -> bool:
@@ -174,12 +174,10 @@ def main(argv: Optional[List[str]] = None) -> int:
     ap.add_argument("template", type=Path, help="the base template (e.g. .env.example)")
     ap.add_argument("envfile", type=Path, help="the env file to check/update (e.g. .env)")
     ap.add_argument("--apply", action="store_true", help="write changes (default: report only)")
-    ap.add_argument("--mode", choices=["append", "rewrite"], default="append",
-                    help="append (default: add missing vars in place) or rewrite (restructure to template)")
+    ap.add_argument("--mode", choices=["append", "rewrite"], default="append", help="append (default: add missing vars in place) or rewrite (restructure to template)")
     ap.add_argument("--backup", action="store_true", help="write ENVFILE.bak before applying")
     ap.add_argument("--no-comments", action="store_true", help="append mode: omit template comments")
-    ap.add_argument("--missing-env-ok", action="store_true",
-                    help="exit 0 (not 1) when ENVFILE doesn't exist — for pre-commit on machines with no .env")
+    ap.add_argument("--missing-env-ok", action="store_true", help="exit 0 (not 1) when ENVFILE doesn't exist — for pre-commit on machines with no .env")
     args = ap.parse_args(argv)
 
     if not args.template.exists():
