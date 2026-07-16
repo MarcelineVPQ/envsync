@@ -1,5 +1,7 @@
 # envsync
 
+[![tests](https://github.com/MarcelineVPQ/envsync/actions/workflows/tests.yml/badge.svg)](https://github.com/MarcelineVPQ/envsync/actions/workflows/tests.yml)
+
 A tiny, dependency-free tool that keeps a real `.env` in sync with a documented
 template (`.env.example`). When the template grows a new variable, envsync tells
 you your `.env` is behind — and can add the newcomer (with its comment + default)
